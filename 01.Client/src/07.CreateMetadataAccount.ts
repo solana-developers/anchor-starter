@@ -118,7 +118,7 @@ import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
   }
 
   console.log(
-    "Mint Account: ",
+    "Mint Account:",
     `https://explorer.solana.com/address/${mintKeypair.publicKey.toString()}?cluster=devnet`
   );
 })();
