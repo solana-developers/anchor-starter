@@ -1,8 +1,8 @@
+import { useState } from "react";
 import { Button } from "@chakra-ui/react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { getAssociatedTokenAddressSync } from "@solana/spl-token";
 import { program, mintPDA } from "@/anchor/setup";
-import { useState } from "react";
 
 export default function IncrementButton() {
   const { publicKey, sendTransaction } = useWallet();
@@ -38,10 +38,8 @@ export default function IncrementButton() {
   };
 
   return (
-    publicKey && (
-      <Button onClick={onClick} isLoading={isLoading}>
-        Increment
-      </Button>
-    )
+    <Button onClick={onClick} isLoading={isLoading}>
+      Increment
+    </Button>
   );
 }

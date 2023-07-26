@@ -14,6 +14,7 @@
     "@coral-xyz/anchor": "^0.28.1-beta.1",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@solana/pay": "^0.2.5",
     "@solana/spl-token": "^0.3.8",
     "@solana/wallet-adapter-base": "^0.9.22",
     "@solana/wallet-adapter-react": "^0.15.33",
@@ -28,6 +29,7 @@
     "framer-motion": "^10.13.1",
     "next": "13.4.12",
     "react": "18.2.0",
+    "react-circular-progressbar": "^2.1.0",
     "react-dom": "18.2.0",
     "typescript": "5.1.6"
   }
