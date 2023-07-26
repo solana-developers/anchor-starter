@@ -8,3 +8,13 @@ const programId = new PublicKey("9C2fNrE8KAf6qG7kDNprPsm2VE3qK77KCDrZQVAjwVjt");
 export const program = new Program<Counter>(IDL, programId, {
   connection,
 });
+
+export const [mintPDA] = PublicKey.findProgramAddressSync(
+  [Buffer.from("mint")],
+  program.programId
+);
+
+export const [counterPDA] = PublicKey.findProgramAddressSync(
+  [Buffer.from("counter")],
+  program.programId
+);

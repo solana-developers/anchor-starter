@@ -1,5 +1,6 @@
-import { Box, Flex, Spacer } from "@chakra-ui/react"
-import WalletMultiButton from "@/components/WalletMultiButton"
+import { Box, Flex, Spacer, VStack } from "@chakra-ui/react";
+import WalletMultiButton from "@/components/WalletMultiButton";
+import IncrementButton from "@/components/IncrementButton";
 
 export default function Home() {
   return (
@@ -8,6 +9,9 @@ export default function Home() {
         <Spacer />
         <WalletMultiButton />
       </Flex>
+      <VStack justifyContent="center">
+        <IncrementButton />
+      </VStack>
     </Box>
-  )
+  );
 }
