@@ -26,7 +26,7 @@ describe("counter", () => {
         counter: counterAccount.publicKey,
       })
       .signers([counterAccount])
-      .rpc();
+      .rpc({ skipPreflight: true });
 
     const accountData = await program.account.counter.fetch(
       counterAccount.publicKey
@@ -57,7 +57,7 @@ describe("counter", () => {
   it("Increment 2", async () => {
     const transaction = await program.methods
       .increment()
-      .accounts({ counter: counterAccount.publicKey, user: wallet.publicKey })
+      .accounts({ counter: counterAccount.publicKey })
       .transaction();
 
     const txSig = await sendAndConfirmTransaction(
@@ -79,7 +79,7 @@ describe("counter", () => {
   it("Increment 3", async () => {
     const instruction = await program.methods
       .increment()
-      .accounts({ counter: counterAccount.publicKey, user: wallet.publicKey })
+      .accounts({ counter: counterAccount.publicKey })
       .instruction();
 
     const transaction = new Transaction().add(instruction);

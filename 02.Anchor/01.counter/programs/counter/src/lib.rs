@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("G4HE8NNmb7FaSAyB66H2eU2AvHdBKkQb3LYbaLzChy8q");
+declare_id!("4pj5BFwUvfgS3VDT5Geq3ZhfG28LQkSCghWwCubV6tN9");
 
 #[program]
 pub mod counter {
@@ -24,27 +24,23 @@ pub mod counter {
 
 #[derive(Accounts)]
 pub struct Initialize<'info> {
+    #[account(mut)]
+    pub user: Signer<'info>,
     #[account(
         init,
         payer = user,
-        space = 8 + Counter::INIT_SPACE)]
+        space = 8 + 8)]
     pub counter: Account<'info, Counter>,
-    #[account(mut)]
-    pub user: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
 pub struct Increment<'info> {
-    #[account(
-        mut,
-    )]
+    #[account(mut)]
     pub counter: Account<'info, Counter>,
-    pub user: Signer<'info>,
 }
 
 #[account]
-#[derive(InitSpace)]
 pub struct Counter {
     pub count: u64,
 }
