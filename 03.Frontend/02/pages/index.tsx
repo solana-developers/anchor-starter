@@ -1,5 +1,6 @@
 import { Box, Flex, Spacer, VStack } from "@chakra-ui/react";
 import WalletMultiButton from "@/components/WalletMultiButton";
+import CounterState from "@/components/CounterState";
 import IncrementButton from "@/components/IncrementButton";
 
 export default function Home() {
@@ -10,6 +11,7 @@ export default function Home() {
         <WalletMultiButton />
       </Flex>
       <VStack justifyContent="center">
+        <CounterState />
         <IncrementButton />
       </VStack>
     </Box>
