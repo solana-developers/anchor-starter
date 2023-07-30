@@ -24,7 +24,7 @@ export default function Home() {
       </Flex>
 
       <VStack justifyContent="center">
-        <CounterState />s
+        <CounterState />
         {publicKey && (
           <>
             <IncrementButton />

@@ -1,19 +1,19 @@
 import {
   Connection,
+  clusterApiUrl,
   Keypair,
   SystemProgram,
   Transaction,
-  clusterApiUrl,
   sendAndConfirmTransaction,
 } from "@solana/web3.js";
 import {
   createMint,
-  TOKEN_PROGRAM_ID,
+  createInitializeAccountInstruction,
   createAccount,
   ACCOUNT_SIZE,
-  createInitializeAccountInstruction,
+  TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
-import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
+import { getOrCreateKeypair } from "./utils";
 
 (async () => {
   // Establish a connection to the Solana devnet cluster
@@ -22,18 +22,13 @@ import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
   // Use existing keypairs or generate new ones if they don't exist
   const wallet_1 = await getOrCreateKeypair("wallet_1");
 
-  console.log(`\n`);
-
-  // Request an airdrop of SOL to wallet_1 if its balance is less than 1 SOL
-  await airdropSolIfNeeded(wallet_1.publicKey);
-
   // Create mint using `createMint` helper function
   const mint = await createMint(
     connection,
     wallet_1, // payer
     wallet_1.publicKey, // mint authority
     wallet_1.publicKey, // freeze authority
-    9 // decimals
+    2 // decimals
   );
 
   // Generate keypair to use as address of token account
@@ -54,10 +49,9 @@ import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
 
   // Instruction to initialize token account
   const initializeAccountInstruction = createInitializeAccountInstruction(
-    tokenKeypair.publicKey,
-    mint,
-    wallet_1.publicKey,
-    TOKEN_PROGRAM_ID
+    tokenKeypair.publicKey, // token account address
+    mint, // mint address
+    wallet_1.publicKey // token account owner
   );
 
   const transaction = new Transaction().add(
@@ -65,19 +59,19 @@ import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
     initializeAccountInstruction
   );
 
-  try {
-    const txSig = await sendAndConfirmTransaction(connection, transaction, [
+  const transactionSignature = await sendAndConfirmTransaction(
+    connection,
+    transaction,
+    [
       wallet_1, // payer
-      tokenKeypair,
-    ]);
+      tokenKeypair, // token address keypair
+    ]
+  );
 
-    console.log(
-      "Transaction Signature:",
-      `https://explorer.solana.com/tx/${txSig}?cluster=devnet`
-    );
-  } catch (error) {
-    console.error("Transaction unsuccessful: ", error);
-  }
+  console.log(
+    "Transaction Signature:",
+    `https://explorer.solana.com/tx/${transactionSignature}?cluster=devnet`
+  );
 
   console.log(
     "Token Account 1: ",
@@ -88,7 +82,7 @@ import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
   const tokenAccount = await createAccount(
     connection,
     wallet_1, // payer
-    mint,
+    mint, // mint address
     wallet_1.publicKey, // token account owner
     tokenKeypair2 // token address
   );

@@ -1,6 +1,7 @@
 {
   "scripts": {
     "test": "yarn run ts-mocha -p tsconfig.json -t 1000000 ./src/test.ts",
+    "00": "ts-node src/00.Starter.ts",
     "01": "ts-node src/01.SolTransfer.ts",
     "02": "ts-node src/02.CreateMintAccount.ts",
     "03": "ts-node src/03.CreateTokenAccount.ts",

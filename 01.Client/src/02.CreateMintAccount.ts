@@ -1,19 +1,19 @@
 import {
   Connection,
+  clusterApiUrl,
   Keypair,
   SystemProgram,
   Transaction,
-  clusterApiUrl,
   sendAndConfirmTransaction,
 } from "@solana/web3.js";
 import {
-  MINT_SIZE,
   createMint,
-  getMinimumBalanceForRentExemptMint,
-  TOKEN_PROGRAM_ID,
   createInitializeMint2Instruction,
+  getMinimumBalanceForRentExemptMint,
+  MINT_SIZE,
+  TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
-import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
+import { getOrCreateKeypair } from "./utils";
 
 (async () => {
   // Establish a connection to the Solana devnet cluster
@@ -22,16 +22,10 @@ import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
   // Use existing keypairs or generate new ones if they don't exist
   const wallet_1 = await getOrCreateKeypair("wallet_1");
 
-  console.log(`\n`);
-
-  // Request an airdrop of SOL to wallet_1 if its balance is less than 1 SOL
-  await airdropSolIfNeeded(wallet_1.publicKey);
-
   // Generate keypair to use as address of token account
   const mintKeypair = Keypair.generate();
   // Calculate minimum lamports for space required by mint account
   const lamports = await getMinimumBalanceForRentExemptMint(connection);
-  const decimal = 9;
 
   // Instruction to create new account with space for new mint account
   const createAccountInstruction = SystemProgram.createAccount({
@@ -45,7 +39,7 @@ import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
   // Instruction to initialize mint account
   const initializeMintInstruction = createInitializeMint2Instruction(
     mintKeypair.publicKey,
-    decimal,
+    2, // decimals
     wallet_1.publicKey, // mint authority
     wallet_1.publicKey // freeze authority
   );
@@ -56,19 +50,19 @@ import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
     initializeMintInstruction
   );
 
-  try {
-    const txSig = await sendAndConfirmTransaction(connection, transaction, [
+  const transactionSignature = await sendAndConfirmTransaction(
+    connection,
+    transaction,
+    [
       wallet_1, // payer
       mintKeypair, // mint address keypair
-    ]);
+    ]
+  );
 
-    console.log(
-      "Transaction Signature:",
-      `https://explorer.solana.com/tx/${txSig}?cluster=devnet`
-    );
-  } catch (error) {
-    console.error("Transaction unsuccessful: ", error);
-  }
+  console.log(
+    "Transaction Signature:",
+    `https://explorer.solana.com/tx/${transactionSignature}?cluster=devnet`
+  );
 
   console.log(
     "Mint Account 1: ",
@@ -81,7 +75,7 @@ import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
     wallet_1, // payer
     wallet_1.publicKey, // mint authority
     wallet_1.publicKey, // freeze authority
-    decimal // decimals
+    2 // decimals
   );
 
   console.log(

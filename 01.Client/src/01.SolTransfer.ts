@@ -1,12 +1,12 @@
 import {
   Connection,
+  clusterApiUrl,
   LAMPORTS_PER_SOL,
   SystemProgram,
   Transaction,
-  clusterApiUrl,
   sendAndConfirmTransaction,
 } from "@solana/web3.js";
-import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
+import { getOrCreateKeypair } from "./utils";
 
 (async () => {
   // Establish a connection to the Solana devnet cluster
@@ -15,11 +15,6 @@ import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
   // Use existing keypairs or generate new ones if they don't exist
   const wallet_1 = await getOrCreateKeypair("wallet_1");
   const wallet_2 = await getOrCreateKeypair("wallet_2");
-
-  console.log(`\n`);
-
-  // Request an airdrop of SOL to wallet_1 if its balance is less than 1 SOL
-  await airdropSolIfNeeded(wallet_1.publicKey);
 
   // Define the amount to transfer
   const transferAmount = 0.1; // 0.1 SOL
@@ -34,18 +29,17 @@ import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
   // Add the transfer instruction to a new transaction
   const transaction = new Transaction().add(transferInstruction);
 
-  try {
-    const txSig = await sendAndConfirmTransaction(connection, transaction, [
-      wallet_1,
-    ]);
+  // Send the transaction to the network
+  const transactionSignature = await sendAndConfirmTransaction(
+    connection,
+    transaction,
+    [wallet_1] // signer
+  );
 
-    console.log(
-      "Transaction Signature:",
-      `https://explorer.solana.com/tx/${txSig}?cluster=devnet`
-    );
-  } catch (error) {
-    console.error("Transaction unsuccessful: ", error);
-  }
+  console.log(
+    "Transaction Signature:",
+    `https://explorer.solana.com/tx/${transactionSignature}?cluster=devnet`
+  );
 
   // Retrieve and log the new balance of each wallet after the transfer
   const balance1 = await connection.getBalance(wallet_1.publicKey);

@@ -1,23 +1,23 @@
 import {
   Connection,
+  clusterApiUrl,
   Keypair,
   PublicKey,
   SystemProgram,
   Transaction,
-  clusterApiUrl,
   sendAndConfirmTransaction,
 } from "@solana/web3.js";
 import {
-  MINT_SIZE,
-  getMinimumBalanceForRentExemptMint,
-  TOKEN_PROGRAM_ID,
   createInitializeMint2Instruction,
+  getMinimumBalanceForRentExemptMint,
+  MINT_SIZE,
+  TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import {
   PROGRAM_ID as METADATA_PROGRAM_ID,
   createCreateMetadataAccountV3Instruction,
 } from "@metaplex-foundation/mpl-token-metadata";
-import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
+import { getOrCreateKeypair } from "./utils";
 
 (async () => {
   // Establish a connection to the Solana devnet cluster
@@ -26,16 +26,10 @@ import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
   // Use existing keypairs or generate new ones if they don't exist
   const wallet_1 = await getOrCreateKeypair("wallet_1");
 
-  console.log(`\n`);
-
-  // Request an airdrop of SOL to wallet_1 if its balance is less than 1 SOL
-  await airdropSolIfNeeded(wallet_1.publicKey);
-
   // Generate keypair to use as address of token account
   const mintKeypair = Keypair.generate();
   // Calculate minimum lamports for space required by mint account
   const lamports = await getMinimumBalanceForRentExemptMint(connection);
-  const decimal = 9;
 
   // Instruction to create new account with space for new mint account
   const createAccountInstruction = SystemProgram.createAccount({
@@ -48,17 +42,18 @@ import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
 
   // Instruction to initialize mint account
   const initializeMintInstruction = createInitializeMint2Instruction(
-    mintKeypair.publicKey,
-    decimal,
+    mintKeypair.publicKey, // mint address
+    2, // decimals
     wallet_1.publicKey, // mint authority
     wallet_1.publicKey // freeze authority
   );
 
+  // Derive the Metadata account address
   const [metadataAccountAddress] = PublicKey.findProgramAddressSync(
     [
-      Buffer.from("metadata"),
-      METADATA_PROGRAM_ID.toBuffer(),
-      mintKeypair.publicKey.toBuffer(),
+      Buffer.from("metadata"), // hard-coded string "metadata"
+      METADATA_PROGRAM_ID.toBuffer(), // metadata program address
+      mintKeypair.publicKey.toBuffer(), // mint address
     ],
     METADATA_PROGRAM_ID
   );
@@ -82,16 +77,16 @@ import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
     {
       createMetadataAccountArgsV3: {
         data: {
-          creators: null,
+          creators: null, // used by NFTs
           name: tokenMetadata.name,
           symbol: tokenMetadata.symbol,
           uri: tokenMetadata.uri,
-          sellerFeeBasisPoints: 0,
-          collection: null,
-          uses: null,
+          sellerFeeBasisPoints: 0, // royalty fee for NFTs
+          collection: null, // used by NFTs
+          uses: null, // used by NFTs
         },
-        collectionDetails: null,
-        isMutable: true,
+        collectionDetails: null, // used by NFTs
+        isMutable: true, // allow updating the metadata account
       },
     }
   );
@@ -103,19 +98,19 @@ import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
     createMetadataInstruction
   );
 
-  try {
-    const txSig = await sendAndConfirmTransaction(connection, transaction, [
+  const transactionSignature = await sendAndConfirmTransaction(
+    connection,
+    transaction,
+    [
       wallet_1, // payer
       mintKeypair, // mint address keypair
-    ]);
+    ]
+  );
 
-    console.log(
-      "Transaction Signature:",
-      `https://explorer.solana.com/tx/${txSig}?cluster=devnet`
-    );
-  } catch (error) {
-    console.error("Transaction unsuccessful: ", error);
-  }
+  console.log(
+    "Transaction Signature:",
+    `https://explorer.solana.com/tx/${transactionSignature}?cluster=devnet`
+  );
 
   console.log(
     "Mint Account:",

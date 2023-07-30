@@ -1,19 +1,19 @@
 import {
   Connection,
+  clusterApiUrl,
   PublicKey,
   Transaction,
-  clusterApiUrl,
   sendAndConfirmTransaction,
 } from "@solana/web3.js";
 import {
   createMint,
-  TOKEN_PROGRAM_ID,
   createAccount,
   createAssociatedTokenAccountInstruction,
   getAssociatedTokenAddress,
   ASSOCIATED_TOKEN_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
-import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
+import { getOrCreateKeypair } from "./utils";
 
 (async () => {
   // Establish a connection to the Solana devnet cluster
@@ -23,31 +23,27 @@ import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
   const wallet_1 = await getOrCreateKeypair("wallet_1");
   const wallet_2 = await getOrCreateKeypair("wallet_2");
 
-  console.log(`\n`);
-
-  // Request an airdrop of SOL to wallet_1 if its balance is less than 1 SOL
-  await airdropSolIfNeeded(wallet_1.publicKey);
-
   // Create mint using `createMint` helper function
   const mint = await createMint(
     connection,
     wallet_1, // payer
     wallet_1.publicKey, // mint authority
     wallet_1.publicKey, // freeze authority
-    9 // decimals
+    2 // decimals
   );
 
   // Get associated token account address
   const associatedTokenAccountAddress = await getAssociatedTokenAddress(
-    mint,
-    wallet_1.publicKey
+    mint, // mint address
+    wallet_1.publicKey // token account owner
   );
 
+  // Manually derive associated token account address
   const [PDA] = PublicKey.findProgramAddressSync(
     [
-      wallet_1.publicKey.toBuffer(),
-      TOKEN_PROGRAM_ID.toBuffer(),
-      mint.toBuffer(),
+      wallet_1.publicKey.toBuffer(), // token account owner
+      TOKEN_PROGRAM_ID.toBuffer(), // token program address
+      mint.toBuffer(), // mint address
     ],
     ASSOCIATED_TOKEN_PROGRAM_ID
   );
@@ -65,18 +61,18 @@ import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
 
   const transaction = new Transaction().add(instruction);
 
-  try {
-    const txSig = await sendAndConfirmTransaction(connection, transaction, [
+  const transactionSignature = await sendAndConfirmTransaction(
+    connection,
+    transaction,
+    [
       wallet_1, // payer
-    ]);
+    ]
+  );
 
-    console.log(
-      "Transaction Signature:",
-      `https://explorer.solana.com/tx/${txSig}?cluster=devnet`
-    );
-  } catch (error) {
-    console.error("Transaction unsuccessful: ", error);
-  }
+  console.log(
+    "Transaction Signature:",
+    `https://explorer.solana.com/tx/${transactionSignature}?cluster=devnet`
+  );
 
   console.log(
     "Token Account 1: ",
@@ -86,15 +82,15 @@ import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
   const associatedTokenAccount = await createAccount(
     connection,
     wallet_1, // payer
-    mint,
+    mint, // mint address
     wallet_2.publicKey // token account owner
   );
 
   const [PDA2] = PublicKey.findProgramAddressSync(
     [
-      wallet_2.publicKey.toBuffer(),
-      TOKEN_PROGRAM_ID.toBuffer(),
-      mint.toBuffer(),
+      wallet_2.publicKey.toBuffer(), // token account owner
+      TOKEN_PROGRAM_ID.toBuffer(), // token program address
+      mint.toBuffer(), // mint address
     ],
     ASSOCIATED_TOKEN_PROGRAM_ID
   );

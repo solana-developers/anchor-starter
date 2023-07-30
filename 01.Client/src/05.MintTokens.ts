@@ -1,7 +1,7 @@
 import {
   Connection,
-  Transaction,
   clusterApiUrl,
+  Transaction,
   sendAndConfirmTransaction,
 } from "@solana/web3.js";
 import {
@@ -10,7 +10,7 @@ import {
   createMintToInstruction,
   mintTo,
 } from "@solana/spl-token";
-import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
+import { getOrCreateKeypair } from "./utils";
 
 (async () => {
   // Establish a connection to the Solana devnet cluster
@@ -19,62 +19,55 @@ import { getOrCreateKeypair, airdropSolIfNeeded } from "./utils";
   // Use existing keypairs or generate new ones if they don't exist
   const wallet_1 = await getOrCreateKeypair("wallet_1");
 
-  console.log(`\n`);
-
-  // Request an airdrop of SOL to wallet_1 if its balance is less than 1 SOL
-  await airdropSolIfNeeded(wallet_1.publicKey);
-
   // Create mint using `createMint` helper function
   const mint = await createMint(
     connection,
     wallet_1, // payer
     wallet_1.publicKey, // mint authority
     wallet_1.publicKey, // freeze authority
-    9 // decimals
+    2 // decimals
   );
 
   const associatedTokenAccount = await createAccount(
     connection,
     wallet_1, // payer
-    mint,
+    mint, // mint address
     wallet_1.publicKey // token account owner
   );
 
-  const amount = 1_000_000_000;
-
   const instruction = await createMintToInstruction(
-    mint,
+    mint, // mint address
     associatedTokenAccount, // destination
     wallet_1.publicKey, // mint authority
-    amount // amount
+    100 // amount
   );
 
   const transaction = new Transaction().add(instruction);
 
-  try {
-    const txSig = await sendAndConfirmTransaction(connection, transaction, [
-      wallet_1, // payer
-    ]);
-
-    console.log(
-      "Transaction Signature:",
-      `https://explorer.solana.com/tx/${txSig}?cluster=devnet`
-    );
-  } catch (error) {
-    console.error("Transaction unsuccessful: ", error);
-  }
-
-  const txSig = await mintTo(
+  const transactionSignature = await sendAndConfirmTransaction(
     connection,
-    wallet_1,
-    mint,
-    associatedTokenAccount,
-    wallet_1.publicKey,
-    amount
+    transaction,
+    [
+      wallet_1, // payer
+    ]
   );
 
   console.log(
     "Transaction Signature:",
-    `https://explorer.solana.com/tx/${txSig}?cluster=devnet`
+    `https://explorer.solana.com/tx/${transactionSignature}?cluster=devnet`
+  );
+
+  const transactionSignature2 = await mintTo(
+    connection,
+    wallet_1, // payer
+    mint, // mint address
+    associatedTokenAccount, // destination
+    wallet_1.publicKey, // mint authority
+    100 // amount
+  );
+
+  console.log(
+    "Transaction Signature:",
+    `https://explorer.solana.com/tx/${transactionSignature2}?cluster=devnet`
   );
 })();
