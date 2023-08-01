@@ -43,10 +43,7 @@ describe("counter", () => {
   });
 
   it("Increment 2", async () => {
-    const transaction = await program.methods
-      .increment()
-      .accounts({})
-      .transaction();
+    const transaction = await program.methods.increment().transaction();
 
     const txSig = await sendAndConfirmTransaction(
       connection,

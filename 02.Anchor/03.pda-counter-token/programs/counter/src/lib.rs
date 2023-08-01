@@ -60,7 +60,6 @@ pub mod counter {
         msg!("Counter incremented! Current count: {}", counter.count);
 
         let signer_seeds: &[&[&[u8]]] = &[&[b"mint", &[*ctx.bumps.get("mint").unwrap()]]];
-
         mint_to(
             CpiContext::new_with_signer(
                 ctx.accounts.token_program.to_account_info(),
