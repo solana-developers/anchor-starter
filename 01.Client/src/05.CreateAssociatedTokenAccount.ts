@@ -39,7 +39,7 @@ import { getOrCreateKeypair } from "./utils";
   );
 
   // Manually derive associated token account address
-  const [PDA] = PublicKey.findProgramAddressSync(
+  const [PDA, bump] = PublicKey.findProgramAddressSync(
     [
       wallet_1.publicKey.toBuffer(), // token account owner
       TOKEN_PROGRAM_ID.toBuffer(), // token program address
@@ -86,7 +86,7 @@ import { getOrCreateKeypair } from "./utils";
     wallet_2.publicKey // token account owner
   );
 
-  const [PDA2] = PublicKey.findProgramAddressSync(
+  const [PDA2, bump2] = PublicKey.findProgramAddressSync(
     [
       wallet_2.publicKey.toBuffer(), // token account owner
       TOKEN_PROGRAM_ID.toBuffer(), // token program address

@@ -26,13 +26,28 @@ import { getOrCreateKeypair } from "./utils";
   // Define the amount to transfer
   const transferAmount = 0.1; // 0.1 SOL
 
-  // Create a transfer instruction for transferring SOL from wallet_1 to wallet_2
-  const transferInstruction = SystemProgram.transfer({
-    fromPubkey: wallet_1.publicKey,
-    toPubkey: wallet_2.publicKey,
-    lamports: transferAmount * LAMPORTS_PER_SOL, // Convert transferAmount to lamports
-  });
+  // Instruction index for the SystemProgram transfer instruction
+  const transferInstructionIndex = 2;
 
+  // Create a buffer for the data to be passed to the transfer instruction
+  const instructionData = Buffer.alloc(4 + 8); // uint32 + uint64
+  // Write the instruction index to the buffer
+  instructionData.writeUInt32LE(transferInstructionIndex, 0);
+  // Write the transfer amount to the buffer
+  instructionData.writeBigUInt64LE(
+    BigInt(transferAmount * LAMPORTS_PER_SOL),
+    4
+  );
+
+  // Manually create a transfer instruction for transferring SOL from wallet_1 to wallet_2
+  const transferInstruction = new TransactionInstruction({
+    keys: [
+      { pubkey: wallet_1.publicKey, isSigner: true, isWritable: true },
+      { pubkey: wallet_2.publicKey, isSigner: false, isWritable: true },
+    ],
+    programId: SystemProgram.programId,
+    data: instructionData,
+  });
   // Add the transfer instruction to a new transaction
   const transaction = new Transaction().add(transferInstruction);
 

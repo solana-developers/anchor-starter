@@ -16,18 +16,21 @@ describe("counter", () => {
   const program = anchor.workspace.Counter as Program<Counter>;
   const wallet = provider.wallet as anchor.Wallet;
   const connection = provider.connection;
+
+  // Generate a new keypair to use as the address the counter account
   const counterAccount = Keypair.generate();
 
   it("Is initialized!", async () => {
-    // Add your test here.
+    // Invoke the initialize instruction
     const txSig = await program.methods
       .initialize()
       .accounts({
         counter: counterAccount.publicKey,
       })
-      .signers([counterAccount])
+      .signers([counterAccount]) // include counter keypair as additional signer
       .rpc({ skipPreflight: true });
 
+    // Fetch the counter account data
     const accountData = await program.account.counter.fetch(
       counterAccount.publicKey
     );
@@ -38,6 +41,7 @@ describe("counter", () => {
   });
 
   it("Increment 1", async () => {
+    // Invoke the increment instruction
     const txSig = await program.methods
       .increment()
       .accounts({
@@ -45,6 +49,7 @@ describe("counter", () => {
       })
       .rpc();
 
+    // Fetch the counter account data
     const accountData = await program.account.counter.fetch(
       counterAccount.publicKey
     );
@@ -55,11 +60,13 @@ describe("counter", () => {
   });
 
   it("Increment 2", async () => {
+    // Create a transaction with the increment instruction
     const transaction = await program.methods
       .increment()
       .accounts({ counter: counterAccount.publicKey })
       .transaction();
 
+    // Send the transaction
     const txSig = await sendAndConfirmTransaction(
       connection,
       transaction,
@@ -67,6 +74,7 @@ describe("counter", () => {
       { commitment: "confirmed" }
     );
 
+    // Fetch the counter account data
     const accountData = await program.account.counter.fetch(
       counterAccount.publicKey
     );
@@ -77,13 +85,16 @@ describe("counter", () => {
   });
 
   it("Increment 3", async () => {
+    // Create the increment instruction
     const instruction = await program.methods
       .increment()
       .accounts({ counter: counterAccount.publicKey })
       .instruction();
 
+    // Create new transaction and add the increment instruction to the transaction
     const transaction = new Transaction().add(instruction);
 
+    // Send the transaction
     const txSig = await sendAndConfirmTransaction(
       connection,
       transaction,
@@ -91,6 +102,7 @@ describe("counter", () => {
       { commitment: "confirmed" }
     );
 
+    // Fetch the counter account data
     const accountData = await program.account.counter.fetch(
       counterAccount.publicKey
     );

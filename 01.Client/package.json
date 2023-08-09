@@ -1,14 +1,14 @@
 {
   "scripts": {
-    "test": "yarn run ts-mocha -p tsconfig.json -t 1000000 ./src/test.ts",
     "00": "ts-node src/00.Starter.ts",
     "01": "ts-node src/01.SolTransfer.ts",
-    "02": "ts-node src/02.CreateMintAccount.ts",
-    "03": "ts-node src/03.CreateTokenAccount.ts",
-    "04": "ts-node src/04.CreateAssociatedTokenAccount.ts",
-    "05": "ts-node src/05.MintTokens.ts",
-    "06": "ts-node src/06.TransferTokens.ts",
-    "07": "ts-node src/07.CreateMetadataAccount.ts"
+    "02": "ts-node src/02.SolTransferManual.ts",
+    "03": "ts-node src/03.CreateMintAccount.ts",
+    "04": "ts-node src/04.CreateTokenAccount.ts",
+    "05": "ts-node src/05.CreateAssociatedTokenAccount.ts",
+    "06": "ts-node src/06.MintTokens.ts",
+    "07": "ts-node src/07.TransferTokens.ts",
+    "08": "ts-node src/08.CreateMetadataAccount.ts"
   },
   "license": "MIT",
   "dependencies": {

@@ -26,22 +26,26 @@ pub mod counter {
 pub struct Initialize<'info> {
     #[account(mut)]
     pub user: Signer<'info>,
+
+    // Create and initialize `Counter` account using a PDA as the address
     #[account(
         init,
-        seeds = [b"counter"],
-        bump,
+        seeds = [b"counter"], // optional seeds for pda
+        bump,                 // bump seed for pda
         payer = user,
-        space = 8 + 8)]
+        space = 8 + 8
+    )]
     pub counter: Account<'info, Counter>,
     pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
 pub struct Increment<'info> {
+    // The address of the `Counter` account must be a PDA derived with the specified `seeds`
     #[account(
         mut,
-        seeds = [b"counter"],
-        bump,
+        seeds = [b"counter"], // optional seeds for pda
+        bump,                 // bump seed for pda
     )]
     pub counter: Account<'info, Counter>,
 }

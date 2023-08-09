@@ -8,6 +8,10 @@ import { getOrCreateKeypair } from "./utils";
   // Use existing keypairs or generate new ones if they don't exist
   const wallet_1 = await getOrCreateKeypair("wallet_1");
 
+  // Retrieve and log the new balance of each wallet after the transfer
+  const preBalance = await connection.getBalance(wallet_1.publicKey);
+  console.log("wallet_1 prebalance:", preBalance / LAMPORTS_PER_SOL);
+
   // Request the airdrop
   const transactionSignature = await connection.requestAirdrop(
     wallet_1.publicKey,
@@ -33,6 +37,6 @@ import { getOrCreateKeypair } from "./utils";
   );
 
   // Retrieve and log the new balance of each wallet after the transfer
-  const lamportBalance = await connection.getBalance(wallet_1.publicKey);
-  console.log("wallet_1 balance:", lamportBalance / LAMPORTS_PER_SOL);
+  const postBalance = await connection.getBalance(wallet_1.publicKey);
+  console.log("wallet_1 postbalance:", postBalance / LAMPORTS_PER_SOL);
 })();
