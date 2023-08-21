@@ -1,12 +1,6 @@
 import * as fs from "fs";
 import dotenv from "dotenv";
-import {
-  Connection,
-  Keypair,
-  LAMPORTS_PER_SOL,
-  PublicKey,
-  clusterApiUrl,
-} from "@solana/web3.js";
+import { Keypair } from "@solana/web3.js";
 
 dotenv.config();
 

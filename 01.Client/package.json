@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "00": "ts-node src/00.Starter.ts",
+    "00": "ts-node src/00.Airdrop.ts",
     "01": "ts-node src/01.SolTransfer.ts",
     "02": "ts-node src/02.SolTransferManual.ts",
     "03": "ts-node src/03.CreateMintAccount.ts",

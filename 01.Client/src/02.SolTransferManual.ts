@@ -48,6 +48,7 @@ import { getOrCreateKeypair } from "./utils";
     programId: SystemProgram.programId,
     data: instructionData,
   });
+
   // Add the transfer instruction to a new transaction
   const transaction = new Transaction().add(transferInstruction);
 

@@ -5,7 +5,6 @@ import {
   SystemProgram,
   Transaction,
   sendAndConfirmTransaction,
-  TransactionInstruction,
 } from "@solana/web3.js";
 import { getOrCreateKeypair } from "./utils";
 

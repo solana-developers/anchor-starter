@@ -35,7 +35,7 @@ import { getOrCreateKeypair } from "./utils";
     wallet_1.publicKey // token account owner
   );
 
-  const instruction = await createMintToInstruction(
+  const instruction = createMintToInstruction(
     mint, // mint address
     associatedTokenAccount, // destination
     wallet_1.publicKey, // mint authority
