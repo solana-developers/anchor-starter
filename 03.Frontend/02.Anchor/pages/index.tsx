@@ -1,21 +1,10 @@
-import {
-  Box,
-  Button,
-  Flex,
-  Spacer,
-  VStack,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Box, Flex, Spacer, VStack } from "@chakra-ui/react";
 import WalletMultiButton from "@/components/WalletMultiButton";
-import { useWallet } from "@solana/wallet-adapter-react";
 import CounterState from "@/components/CounterState";
 import IncrementButton from "@/components/IncrementButton";
-import QrModal from "@/components/SolanaPay";
+import SolanaPayQR from "@/components/SolanaPayQR";
 
 export default function Home() {
-  const { publicKey } = useWallet();
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
   return (
     <Box>
       <Flex px={4} py={4}>
@@ -25,13 +14,8 @@ export default function Home() {
 
       <VStack justifyContent="center">
         <CounterState />
-        {publicKey && (
-          <>
-            <IncrementButton />
-            <Button onClick={onOpen}>Solana Pay</Button>
-          </>
-        )}
-        {isOpen && <QrModal onClose={onClose} />}
+        <IncrementButton />
+        <SolanaPayQR />
       </VStack>
     </Box>
   );
