@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 // Specify the program address
-declare_id!("4pj5BFwUvfgS3VDT5Geq3ZhfG28LQkSCghWwCubV6tN9");
+declare_id!("61ykcDtfNU8VkmGn5XvbmfvVBmfDJuqCpQLJyMPoCUyi");
 
 // Instructions defined in program module
 #[program]

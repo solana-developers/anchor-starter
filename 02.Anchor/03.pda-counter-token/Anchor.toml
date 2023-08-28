@@ -3,14 +3,14 @@ seeds = true
 skip-lint = false
 
 [programs.devnet]
-counter = "9C2fNrE8KAf6qG7kDNprPsm2VE3qK77KCDrZQVAjwVjt"
+counter = "9LqCT8TeAdqLUyiPtAKfE7inHLCUUYeEfLiGf7ibzfnK"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Devnet"
-wallet = "/Users/johnliu/.config/solana/id.json"
+cluster = "devnet"
+wallet = "~/.config/solana/id.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"

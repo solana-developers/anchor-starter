@@ -6,7 +6,7 @@ use anchor_spl::{
 };
 use mpl_token_metadata::{pda::find_metadata_account, state::DataV2};
 
-declare_id!("9C2fNrE8KAf6qG7kDNprPsm2VE3qK77KCDrZQVAjwVjt");
+declare_id!("9LqCT8TeAdqLUyiPtAKfE7inHLCUUYeEfLiGf7ibzfnK");
 
 #[program]
 pub mod counter {
