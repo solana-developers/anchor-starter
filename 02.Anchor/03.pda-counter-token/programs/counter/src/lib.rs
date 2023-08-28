@@ -5,8 +5,7 @@ use anchor_spl::{
     token::{mint_to, Mint, MintTo, Token, TokenAccount},
 };
 use mpl_token_metadata::{pda::find_metadata_account, state::DataV2};
-
-declare_id!("9LqCT8TeAdqLUyiPtAKfE7inHLCUUYeEfLiGf7ibzfnK");
+declare_id!("B7TnWKNXQzDWXDCaA5nyrLJZrJKHPSoVZXEWzqBcykKf");
 
 #[program]
 pub mod counter {
