@@ -7,8 +7,7 @@ pub mod counter {
     use super::*;
 
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
-        let counter = &mut ctx.accounts.counter;
-        counter.count = 0;
+        let counter = &ctx.accounts.counter;
         msg!("Counter account created! Current count: {}", counter.count);
         Ok(())
     }

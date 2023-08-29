@@ -1,3 +1,5 @@
+// command to generate on-chain program idl:
+// anchor idl init --filepath target/idl/counter.json <PROGRAM_ID>
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { Counter } from "../target/types/counter";
@@ -32,6 +34,7 @@ describe("counter", () => {
   const METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
     "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
   );
+
   const [metadataAccountAddress] = anchor.web3.PublicKey.findProgramAddressSync(
     [
       Buffer.from("metadata"),
@@ -46,8 +49,6 @@ describe("counter", () => {
     symbol: "GOLDSOL",
     uri: "https://raw.githubusercontent.com/solana-developers/program-examples/new-examples/tokens/tokens/.assets/spl-token.json",
   };
-
-  before(async () => {});
 
   it("Is initialized!", async () => {
     try {

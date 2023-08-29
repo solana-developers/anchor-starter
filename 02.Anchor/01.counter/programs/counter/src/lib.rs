@@ -10,11 +10,8 @@ pub mod counter {
 
     // Instruction to initialize a new counter account
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
-        // Mutable reference to the counter account from the Initialize struct
-        let counter = &mut ctx.accounts.counter;
-
-        // Initialize the data of the newly created counter account
-        counter.count = 0;
+        // Reference to the counter account from the Initialize struct
+        let counter = &ctx.accounts.counter;
         msg!("Counter account created! Current count: {}", counter.count);
         Ok(())
     }
@@ -59,5 +56,5 @@ pub struct Increment<'info> {
 // Define structure of `Counter` account
 #[account]
 pub struct Counter {
-    pub count: u64, // define count value as u64
+    pub count: u64, // define count value type as u64
 }

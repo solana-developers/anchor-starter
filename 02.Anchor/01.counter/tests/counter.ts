@@ -11,18 +11,18 @@ import { expect } from "chai";
 describe("counter", () => {
   // Configure the client to use the local cluster.
   const provider = anchor.AnchorProvider.env();
+  const wallet = provider.wallet as anchor.Wallet;
+  const connection = provider.connection;
   anchor.setProvider(provider);
 
   const program = anchor.workspace.Counter as Program<Counter>;
-  const wallet = provider.wallet as anchor.Wallet;
-  const connection = provider.connection;
 
   // Generate a new keypair to use as the address the counter account
   const counterAccount = Keypair.generate();
 
   it("Is initialized!", async () => {
     // Invoke the initialize instruction
-    const txSig = await program.methods
+    const transactionSignature = await program.methods
       .initialize()
       .accounts({
         counter: counterAccount.publicKey,
@@ -36,7 +36,7 @@ describe("counter", () => {
     );
     expect(accountData.count.toNumber() === 0);
 
-    console.log(`Transaction Signature: ${txSig}`);
+    console.log(`Transaction Signature: ${transactionSignature}`);
     console.log(`Count: ${accountData.count}`);
   });
 

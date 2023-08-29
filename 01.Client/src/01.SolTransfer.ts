@@ -5,6 +5,7 @@ import {
   SystemProgram,
   Transaction,
   sendAndConfirmTransaction,
+  ComputeBudgetProgram,
 } from "@solana/web3.js";
 import { getOrCreateKeypair } from "./utils";
 
@@ -22,6 +23,10 @@ import { getOrCreateKeypair } from "./utils";
   const preBalance2 = await connection.getBalance(wallet_2.publicKey);
   console.log("wallet_2 prebalance:", preBalance2 / LAMPORTS_PER_SOL);
 
+  const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+    units: 1_000_000,
+  });
+
   // Define the amount to transfer
   const transferAmount = 0.1; // 0.1 SOL
 
@@ -33,7 +38,10 @@ import { getOrCreateKeypair } from "./utils";
   });
 
   // Add the transfer instruction to a new transaction
-  const transaction = new Transaction().add(transferInstruction);
+  const transaction = new Transaction().add(
+    modifyComputeUnits,
+    transferInstruction
+  );
 
   // Send the transaction to the network
   const transactionSignature = await sendAndConfirmTransaction(

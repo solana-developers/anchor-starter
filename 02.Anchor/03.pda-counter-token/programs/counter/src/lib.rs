@@ -17,8 +17,7 @@ pub mod counter {
         symbol: String,
         uri: String,
     ) -> Result<()> {
-        let counter = &mut ctx.accounts.counter;
-        counter.count = 0;
+        let counter = &ctx.accounts.counter;
         msg!("Counter account created! Current count: {}", counter.count);
 
         let signer_seeds: &[&[&[u8]]] = &[&[b"mint", &[*ctx.bumps.get("mint").unwrap()]]];
@@ -88,7 +87,7 @@ pub struct Initialize<'info> {
         seeds = [b"counter"],
         bump,
         payer = user,
-        space = 8 + 8)]
+        space = Counter::INIT_SPACE)]
     pub counter: Account<'info, Counter>,
     #[account(
         init,
@@ -141,6 +140,7 @@ pub struct Increment<'info> {
 }
 
 #[account]
+#[derive(InitSpace)]
 pub struct Counter {
     pub count: u64,
 }

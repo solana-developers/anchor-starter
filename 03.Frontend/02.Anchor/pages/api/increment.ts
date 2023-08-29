@@ -74,13 +74,14 @@ async function buildTransaction(account: PublicKey, reference: PublicKey) {
     isWritable: false,
   });
 
-  const latestBlockhash = await connection.getLatestBlockhash();
+  const { blockhash, lastValidBlockHeight } =
+    await connection.getLatestBlockhash();
 
   // create new Transaction and add instruction
   const transaction = new Transaction({
     feePayer: account,
-    blockhash: latestBlockhash.blockhash,
-    lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+    blockhash: blockhash,
+    lastValidBlockHeight: lastValidBlockHeight,
   }).add(instruction);
 
   return transaction
