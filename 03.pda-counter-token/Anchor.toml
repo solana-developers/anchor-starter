@@ -9,8 +9,8 @@ counter = "7Lwn64c4Eb1J5Kcqfte3reZjJoq4bvSfc5hoXpV6YKk3"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Devnet"
-wallet = "/Users/johnliu/.config/solana/id.json"
+cluster = "localnet"
+wallet = "~/.config/solana/id.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"

@@ -55,24 +55,24 @@ describe("counter", () => {
   };
 
   it("Is initialized!", async () => {
-    try {
-      const txSig = await program.methods
-        .initialize(tokenMetadata.name, tokenMetadata.symbol, tokenMetadata.uri)
-        .accounts({
-          metadata: metadataAccountAddress,
-          tokenMetadataProgram: METADATA_PROGRAM_ID,
-        })
-        .rpc({ skipPreflight: true });
+    // try {
+    const txSig = await program.methods
+      .initialize(tokenMetadata.name, tokenMetadata.symbol, tokenMetadata.uri)
+      .accounts({
+        metadata: metadataAccountAddress,
+        tokenMetadataProgram: METADATA_PROGRAM_ID,
+      })
+      .rpc({ skipPreflight: true });
 
-      const accountData = await program.account.counter.fetch(counterPDA);
-      expect(accountData.count.toNumber() === 0);
+    const accountData = await program.account.counter.fetch(counterPDA);
+    expect(accountData.count.toNumber() === 0);
 
-      console.log(`Transaction Signature: ${txSig}`);
-      console.log(`Count: ${accountData.count}`);
-    } catch (error) {
-      // If PDA Account already created, then we expect an error
-      expect(error);
-    }
+    console.log(`Transaction Signature: ${txSig}`);
+    console.log(`Count: ${accountData.count}`);
+    // } catch (error) {
+    // If PDA Account already created, then we expect an error
+    //   expect(error);
+    // }
   });
 
   it("Increment 1", async () => {
