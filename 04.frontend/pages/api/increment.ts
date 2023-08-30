@@ -19,7 +19,7 @@ export default async function handler(
 function get(res: NextApiResponse) {
   res.status(200).json({
     label: "Solana Pay",
-    icon: "https://solana.com/src/img/branding/solanaLogoMark.svg",
+    icon: "https://raw.githubusercontent.com/ZYJLiu/opos-asset/main/assets/OPOS_Social_Square.png",
   });
 }
 
