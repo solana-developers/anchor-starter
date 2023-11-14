@@ -1,10 +1,13 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
-    metadata::{create_metadata_accounts_v3, CreateMetadataAccountsV3, Metadata},
+    metadata::{
+        create_metadata_accounts_v3,
+        mpl_token_metadata::{accounts::Metadata as MetadataAccount, types::DataV2},
+        CreateMetadataAccountsV3, Metadata,
+    },
     token::{mint_to, Mint, MintTo, Token, TokenAccount},
 };
-use mpl_token_metadata::{pda::find_metadata_account, state::DataV2};
 declare_id!("7Lwn64c4Eb1J5Kcqfte3reZjJoq4bvSfc5hoXpV6YKk3");
 
 #[program]
@@ -17,14 +20,19 @@ pub mod counter {
         symbol: String,
         uri: String,
     ) -> Result<()> {
-        let counter = &ctx.accounts.counter;
+        let counter = &mut ctx.accounts.counter;
+        // store bump seeds in `Counter` account
+        counter.counter_bump = ctx.bumps.counter;
+        counter.mint_bump = ctx.bumps.mint;
         msg!("Counter account created! Current count: {}", counter.count);
+        msg!("Counter bump: {}", counter.counter_bump);
+        msg!("Mint bump: {}", counter.mint_bump);
 
-        let signer_seeds: &[&[&[u8]]] = &[&[b"mint", &[*ctx.bumps.get("mint").unwrap()]]];
+        let signer_seeds: &[&[&[u8]]] = &[&[b"mint", &[ctx.bumps.mint]]];
 
         // Invoke the create_metadata_account_v3 instruction on the token metadata program
         create_metadata_accounts_v3(
-            CpiContext::new_with_signer(
+            CpiContext::new(
                 ctx.accounts.token_metadata_program.to_account_info(),
                 CreateMetadataAccountsV3 {
                     metadata: ctx.accounts.metadata.to_account_info(),
@@ -35,8 +43,8 @@ pub mod counter {
                     system_program: ctx.accounts.system_program.to_account_info(),
                     rent: ctx.accounts.rent.to_account_info(),
                 },
-                &signer_seeds,
-            ),
+            )
+            .with_signer(signer_seeds),
             DataV2 {
                 name: name,
                 symbol: symbol,
@@ -46,9 +54,9 @@ pub mod counter {
                 collection: None,
                 uses: None,
             },
-            true,
-            true,
-            None,
+            true, // is_mutable
+            true, // update_authority_is_signer
+            None, // collection_details
         )?;
         Ok(())
     }
@@ -59,19 +67,19 @@ pub mod counter {
         counter.count = counter.count.checked_add(1).unwrap();
         msg!("Counter incremented! Current count: {}", counter.count);
 
-        let signer_seeds: &[&[&[u8]]] = &[&[b"mint", &[*ctx.bumps.get("mint").unwrap()]]];
+        let signer_seeds: &[&[&[u8]]] = &[&[b"mint", &[counter.mint_bump]]];
 
         // Invoke the mint_to instruction on the token program
         mint_to(
-            CpiContext::new_with_signer(
+            CpiContext::new(
                 ctx.accounts.token_program.to_account_info(),
                 MintTo {
                     mint: ctx.accounts.mint.to_account_info(),
                     to: ctx.accounts.token_account.to_account_info(),
                     authority: ctx.accounts.mint.to_account_info(),
                 },
-                signer_seeds,
-            ),
+            )
+            .with_signer(signer_seeds),
             1 * 10u64.pow(ctx.accounts.mint.decimals as u32),
         )?;
         Ok(())
@@ -87,7 +95,7 @@ pub struct Initialize<'info> {
         seeds = [b"counter"],
         bump,
         payer = user,
-        space = 8 + 8
+        space = 8 + Counter::INIT_SPACE
     )]
     pub counter: Account<'info, Counter>,
     #[account(
@@ -102,7 +110,7 @@ pub struct Initialize<'info> {
     ///CHECK: Validate with constraint, also checked by metadata program
     #[account(
         mut,
-        address=find_metadata_account(&mint.key()).0
+        address = MetadataAccount::find_pda(&mint.key()).0,
     )]
     pub metadata: UncheckedAccount<'info>,
     pub token_program: Program<'info, Token>,
@@ -118,13 +126,13 @@ pub struct Increment<'info> {
     #[account(
         mut,
         seeds = [b"counter"],
-        bump,
+        bump = counter.counter_bump,
     )]
     pub counter: Account<'info, Counter>,
     #[account(
         mut,
         seeds = [b"mint"],
-        bump
+        bump = counter.mint_bump,
     )]
     pub mint: Account<'info, Mint>,
     #[account(
@@ -137,10 +145,12 @@ pub struct Increment<'info> {
     pub token_program: Program<'info, Token>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
-    pub rent: Sysvar<'info, Rent>,
 }
 
 #[account]
+#[derive(InitSpace)]
 pub struct Counter {
-    pub count: u64,
+    pub count: u64,       // 8 bytes
+    pub counter_bump: u8, // 1 byte
+    pub mint_bump: u8,    // 1 byte
 }

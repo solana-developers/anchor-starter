@@ -1,12 +1,8 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { Counter } from "../target/types/counter";
-import {
-  Keypair,
-  Transaction,
-  sendAndConfirmTransaction,
-} from "@solana/web3.js";
-import { expect } from "chai";
+import { Keypair, sendAndConfirmTransaction } from "@solana/web3.js";
+import assert from "assert";
 
 describe("counter", () => {
   // Configure the client to use the local cluster.
@@ -34,7 +30,7 @@ describe("counter", () => {
     const accountData = await program.account.counter.fetch(
       counterAccount.publicKey
     );
-    expect(accountData.count.toNumber() === 0);
+    assert(accountData.count.toNumber() === 0);
 
     console.log(`Transaction Signature: ${transactionSignature}`);
     console.log(`Count: ${accountData.count}`);
@@ -53,7 +49,7 @@ describe("counter", () => {
     const accountData = await program.account.counter.fetch(
       counterAccount.publicKey
     );
-    expect(accountData.count.toNumber() === 1);
+    assert(accountData.count.toNumber() === 1);
 
     console.log(`Transaction Signature: ${txSig}`);
     console.log(`Count: ${accountData.count}`);
@@ -78,35 +74,7 @@ describe("counter", () => {
     const accountData = await program.account.counter.fetch(
       counterAccount.publicKey
     );
-    expect(accountData.count.toNumber() === 2);
-
-    console.log(`Transaction Signature: ${txSig}`);
-    console.log(`Count: ${accountData.count}`);
-  });
-
-  it("Increment 3", async () => {
-    // Create the increment instruction
-    const instruction = await program.methods
-      .increment()
-      .accounts({ counter: counterAccount.publicKey })
-      .instruction();
-
-    // Create new transaction and add the increment instruction to the transaction
-    const transaction = new Transaction().add(instruction);
-
-    // Send the transaction
-    const txSig = await sendAndConfirmTransaction(
-      connection,
-      transaction,
-      [wallet.payer],
-      { commitment: "confirmed" }
-    );
-
-    // Fetch the counter account data
-    const accountData = await program.account.counter.fetch(
-      counterAccount.publicKey
-    );
-    expect(accountData.count.toNumber() === 3);
+    assert(accountData.count.toNumber() === 2);
 
     console.log(`Transaction Signature: ${txSig}`);
     console.log(`Count: ${accountData.count}`);

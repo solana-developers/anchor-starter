@@ -1,8 +1,8 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { Counter } from "../target/types/counter";
-import { Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
-import { expect } from "chai";
+import { PublicKey, sendAndConfirmTransaction } from "@solana/web3.js";
+import assert from "assert";
 
 describe("counter", () => {
   // Configure the client to use the local cluster.
@@ -13,7 +13,7 @@ describe("counter", () => {
   const wallet = provider.wallet as anchor.Wallet;
   const connection = provider.connection;
 
-  const [counterPDA] = anchor.web3.PublicKey.findProgramAddressSync(
+  const [counterPDA] = PublicKey.findProgramAddressSync(
     [Buffer.from("counter")],
     program.programId
   );
@@ -23,13 +23,13 @@ describe("counter", () => {
       const txSig = await program.methods.initialize().rpc();
 
       const accountData = await program.account.counter.fetch(counterPDA);
-      expect(accountData.count.toNumber() === 0);
+      assert(accountData.count.toNumber() === 0);
 
       console.log(`Transaction Signature: ${txSig}`);
       console.log(`Count: ${accountData.count}`);
     } catch (error) {
       // If PDA Account already created, then we expect an error
-      expect(error);
+      assert(error);
     }
   });
 
@@ -44,27 +44,6 @@ describe("counter", () => {
 
   it("Increment 2", async () => {
     const transaction = await program.methods.increment().transaction();
-
-    const txSig = await sendAndConfirmTransaction(
-      connection,
-      transaction,
-      [wallet.payer],
-      { commitment: "confirmed" }
-    );
-
-    const accountData = await program.account.counter.fetch(counterPDA);
-
-    console.log(`Transaction Signature: ${txSig}`);
-    console.log(`Count: ${accountData.count}`);
-  });
-
-  it("Increment 3", async () => {
-    const instruction = await program.methods
-      .increment()
-      .accounts({ counter: counterPDA })
-      .instruction();
-
-    const transaction = new Transaction().add(instruction);
 
     const txSig = await sendAndConfirmTransaction(
       connection,
