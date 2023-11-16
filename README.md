@@ -12,17 +12,17 @@ Included are 3 versions a Counter program, each building on the last. The Counte
 - `initialize`: Instruction to create a Counter Account
 - `increment`: Instruction to increment value stored on the Counter Account
 
-### [01.counter](01.counter/programs/counter/src/lib.rs)
+### [01.counter](01-counter/programs/counter/src/lib.rs)
 
 This initial version includes a basic Counter program that creates a Counter Account and increments the value.
 
-### [02.pda-counter](02.pda-counter/programs/counter/src/lib.rs)
+### [02.pda-counter](02-pda-counter/programs/counter/src/lib.rs)
 
 This version updates the Counter program to use a Program Derived Addresses (PDAs) as the Counter Account's address.
 
 The purpose of this program is simply to demonstrate how to create an account using a PDA as the address.
 
-### [03.counter-pda-token](03.pda-counter-token/programs/counter/src/lib.rs)
+### [03.counter-pda-token](03-pda-counter-token/programs/counter/src/lib.rs)
 
 This final version updates the Counter program to:
 
@@ -37,7 +37,7 @@ Additionally, it demonstrates how to invoke the Token program and Metaplex Metad
 
 Also included is a frontend for interacting with the final counter program.
 
-### [04.frontend](04.frontend/)
+### [04.frontend](04-frontend/)
 
 The frontend includes an example of how to invoke the `increment` instruction on the Counter program using either:
 
