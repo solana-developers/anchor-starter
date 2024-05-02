@@ -23,7 +23,7 @@ pub mod counter {
         msg!("Previous counter: {}", counter.count);
 
         // Increment the count value stored on the counter account by 1
-        counter.count = counter.count.checked_add(1).unwrap();
+        counter.count = counter.count + 1;
         msg!("Counter incremented! Current count: {}", counter.count);
         Ok(())
     }
@@ -39,7 +39,7 @@ pub struct Initialize<'info> {
     // The counter account being created and initialized in the instruction
     #[account(
         init,         // specifies we are creating this account
-        payer = user, // specifies account paying for the creationg of the account
+        payer = user, // specifies account paying for the creation of the account
         space = 8 + 8 // space allocated to the new account (8 byte discriminator + 8 byte for u64)
     )]
     pub counter: Account<'info, Counter>, // specify account is 'Counter' type

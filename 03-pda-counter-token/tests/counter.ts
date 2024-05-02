@@ -4,7 +4,10 @@ import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { Counter } from "../target/types/counter";
 import { sendAndConfirmTransaction, PublicKey } from "@solana/web3.js";
-import { getAssociatedTokenAddressSync } from "@solana/spl-token";
+import {
+  TOKEN_2022_PROGRAM_ID,
+  getAssociatedTokenAddressSync,
+} from "@solana/spl-token";
 import assert from "assert";
 
 describe("counter", () => {
@@ -31,39 +34,23 @@ describe("counter", () => {
   // Associated token account address
   const associatedTokenAccount = getAssociatedTokenAddressSync(
     mintPDA,
-    wallet.publicKey
-  );
-
-  // Metadata program id
-  const METADATA_PROGRAM_ID = new PublicKey(
-    "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
-  );
-
-  // Metadata account PDA for mint
-  const [metadataAccountAddress] = PublicKey.findProgramAddressSync(
-    [
-      Buffer.from("metadata"),
-      METADATA_PROGRAM_ID.toBuffer(),
-      mintPDA.toBuffer(),
-    ],
-    METADATA_PROGRAM_ID
+    wallet.publicKey,
+    false,
+    TOKEN_2022_PROGRAM_ID
   );
 
   // Data to initialize token metadata account
   const tokenMetadata = {
-    name: "Solana Gold",
-    symbol: "GOLDSOL",
-    uri: "https://raw.githubusercontent.com/solana-developers/program-examples/new-examples/tokens/tokens/.assets/spl-token.json",
+    name: "OPOS",
+    symbol: "OPOS",
+    uri: "https://raw.githubusercontent.com/solana-developers/opos-asset/main/assets/DeveloperPortal/metadata.json",
   };
 
   it("Is initialized!", async () => {
     try {
       const txSig = await program.methods
-        .initialize(tokenMetadata.name, tokenMetadata.symbol, tokenMetadata.uri)
-        .accounts({
-          metadata: metadataAccountAddress,
-          tokenMetadataProgram: METADATA_PROGRAM_ID,
-        })
+        .initialize(tokenMetadata)
+        .accounts({})
         .rpc({ skipPreflight: true });
 
       const accountData = await program.account.counter.fetch(counterPDA);

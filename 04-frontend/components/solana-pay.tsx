@@ -32,6 +32,7 @@ export default function SolanaPay() {
     };
     const solanaUrl = encodeURL(urlParams);
 
+    console.log("Solana Pay URL", solanaUrl);
     // Create QR code encoded with Solana Pay URL
     const qr = createQR(solanaUrl, 350, "white");
     if (qrRef.current) {
@@ -53,10 +54,10 @@ export default function SolanaPay() {
         // Toast notification
         toast.success(
           <a
-            href={`https://explorer.solana.com/tx/${signatureInfo.signature}?cluster=devnet`}
+            href={`https://solana.fm/tx/${signatureInfo.signature}?cluster=devnet-alpha`}
             target="_blank"
           >
-            View on Solana Explorer
+            View on SolanaFM
           </a>,
           {
             style: {

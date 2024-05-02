@@ -1,5 +1,5 @@
 [features]
-seeds = false
+resolution = true
 skip-lint = false
 
 [programs.localnet]

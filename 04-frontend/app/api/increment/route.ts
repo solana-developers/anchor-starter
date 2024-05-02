@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { PublicKey, Transaction } from "@solana/web3.js";
-import { getAssociatedTokenAddressSync } from "@solana/spl-token";
+import {
+  TOKEN_2022_PROGRAM_ID,
+  getAssociatedTokenAddressSync,
+} from "@solana/spl-token";
 import { program, mintPDA } from "@/anchor/setup";
 
 export async function GET(): Promise<Response> {
@@ -51,7 +54,9 @@ async function buildTransaction(account: PublicKey, reference: PublicKey) {
 
   const associatedTokenAccount = getAssociatedTokenAddressSync(
     mintPDA,
-    account
+    account,
+    false,
+    TOKEN_2022_PROGRAM_ID
   );
 
   const instruction = await program.methods

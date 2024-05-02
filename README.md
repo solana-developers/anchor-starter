@@ -7,7 +7,7 @@ This repo is intended to provide an example of:
 
 ## Anchor Program
 
-Included are 3 versions a Counter program, each building on the last. The Counter program will only include two instructions:
+Included are 3 versions of a Counter program, each building on the last. The Counter program will only include two instructions:
 
 - `initialize`: Instruction to create a Counter Account
 - `increment`: Instruction to increment value stored on the Counter Account
@@ -18,7 +18,7 @@ This initial version includes a basic Counter program that creates a Counter Acc
 
 ### [02.pda-counter](02-pda-counter/programs/counter/src/lib.rs)
 
-This version updates the Counter program to use a Program Derived Addresses (PDAs) as the Counter Account's address.
+This version updates the Counter program to use Program Derived Addresses (PDAs) as the Counter Account's address.
 
 The purpose of this program is simply to demonstrate how to create an account using a PDA as the address.
 
@@ -31,7 +31,7 @@ This final version updates the Counter program to:
 
 The purpose of this program is to demonstrate how to make CPIs and how to use PDAs for signing.
 
-Additionally, it demonstrates how to invoke the Token program and Metaplex Metadata program from an Anchor program.
+Additionally, it demonstrates how to invoke the Token Extensions program and initialize the Metadata Extension to store token metadata directly on the Mint account.
 
 ## Frontend
 
@@ -41,7 +41,7 @@ Also included is a frontend for interacting with the final counter program.
 
 The frontend includes an example of how to invoke the `increment` instruction on the Counter program using either:
 
-- The Solana wallet-adapter with connected a browser Solana wallet
+- The Solana wallet-adapter with connected to a browser Solana wallet
 - Scanning a Solana Pay QR Code with a mobile Solana wallet.
 
 The purpose of this is to demonstrate how to use the program IDL to invoke instructions on the program from a frontend.

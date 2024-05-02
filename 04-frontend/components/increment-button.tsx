@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { getAssociatedTokenAddressSync } from "@solana/spl-token";
+import {
+  TOKEN_2022_PROGRAM_ID,
+  getAssociatedTokenAddressSync,
+} from "@solana/spl-token";
 import { program, mintPDA } from "@/anchor/setup";
-import { Button } from "@nextui-org/button";
+import { Button } from "@nextui-org/react";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function IncrementButton() {
@@ -20,7 +23,9 @@ export default function IncrementButton() {
     try {
       const associatedTokenAccount = getAssociatedTokenAddressSync(
         mintPDA,
-        publicKey
+        publicKey,
+        false,
+        TOKEN_2022_PROGRAM_ID
       );
 
       const transaction = await program.methods
@@ -38,10 +43,10 @@ export default function IncrementButton() {
 
       toast.success(
         <a
-          href={`https://explorer.solana.com/tx/${transactionSignature}?cluster=devnet`}
+          href={`https://solana.fm/tx/${transactionSignature}?cluster=devnet-alpha`}
           target="_blank"
         >
-          View on Solana Explorer
+          View on SolanaFM
         </a>,
         {
           style: {

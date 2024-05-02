@@ -1,25 +1,25 @@
 use anchor_lang::prelude::*;
+use anchor_lang::{
+    solana_program::rent::{DEFAULT_EXEMPTION_THRESHOLD, DEFAULT_LAMPORTS_PER_BYTE_YEAR},
+    system_program::{transfer, Transfer},
+};
 use anchor_spl::{
     associated_token::AssociatedToken,
-    metadata::{
-        create_metadata_accounts_v3,
-        mpl_token_metadata::{accounts::Metadata as MetadataAccount, types::DataV2},
-        CreateMetadataAccountsV3, Metadata,
+    token_2022::{mint_to, MintTo},
+    token_interface::{
+        token_metadata_initialize, Mint, Token2022, TokenAccount, TokenMetadataInitialize,
     },
-    token::{mint_to, Mint, MintTo, Token, TokenAccount},
 };
-declare_id!("B2Sj5CsvGJvYEVUgF1ZBnWsBzWuHRQLrgMSJDjBU5hWA");
+use spl_token_metadata_interface::state::TokenMetadata;
+
+declare_id!("rMK7hPSRqHhst1Fw7sxCMSc1GiBJpYcGrWiY7oHSS5v");
 
 #[program]
 pub mod counter {
+
     use super::*;
 
-    pub fn initialize(
-        ctx: Context<Initialize>,
-        name: String,
-        symbol: String,
-        uri: String,
-    ) -> Result<()> {
+    pub fn initialize(ctx: Context<Initialize>, args: TokenMetadataArgs) -> Result<()> {
         let counter = &mut ctx.accounts.counter;
         // store bump seeds in `Counter` account
         counter.counter_bump = ctx.bumps.counter;
@@ -28,36 +28,53 @@ pub mod counter {
         msg!("Counter bump: {}", counter.counter_bump);
         msg!("Mint bump: {}", counter.mint_bump);
 
-        let signer_seeds: &[&[&[u8]]] = &[&[b"mint", &[ctx.bumps.mint]]];
+        let TokenMetadataArgs { name, symbol, uri } = args;
+        // Define token metadata
+        let token_metadata = TokenMetadata {
+            name: name.clone(),
+            symbol: symbol.clone(),
+            uri: uri.clone(),
+            ..Default::default()
+        };
 
-        // Invoke the create_metadata_account_v3 instruction on the token metadata program
-        create_metadata_accounts_v3(
+        // tlv_size_of() allocates 8 more bytes than we need
+        let data_len = token_metadata.tlv_size_of()? - 8;
+
+        // Calculate lamports required for the additional metadata
+        let lamports =
+            data_len as u64 * DEFAULT_LAMPORTS_PER_BYTE_YEAR * DEFAULT_EXEMPTION_THRESHOLD as u64;
+
+        // Transfer additional lamports to mint account
+        transfer(
             CpiContext::new(
-                ctx.accounts.token_metadata_program.to_account_info(),
-                CreateMetadataAccountsV3 {
-                    metadata: ctx.accounts.metadata.to_account_info(),
+                ctx.accounts.system_program.to_account_info(),
+                Transfer {
+                    from: ctx.accounts.user.to_account_info(),
+                    to: ctx.accounts.mint.to_account_info(),
+                },
+            ),
+            lamports,
+        )?;
+
+        let signer_seeds: &[&[&[u8]]] = &[&[b"mint", &[ctx.bumps.mint]]];
+        // Initialize token metadata
+        token_metadata_initialize(
+            CpiContext::new(
+                ctx.accounts.token_program.to_account_info(),
+                TokenMetadataInitialize {
+                    token_program_id: ctx.accounts.token_program.to_account_info(),
                     mint: ctx.accounts.mint.to_account_info(),
+                    metadata: ctx.accounts.mint.to_account_info(),
                     mint_authority: ctx.accounts.mint.to_account_info(),
                     update_authority: ctx.accounts.mint.to_account_info(),
-                    payer: ctx.accounts.user.to_account_info(),
-                    system_program: ctx.accounts.system_program.to_account_info(),
-                    rent: ctx.accounts.rent.to_account_info(),
                 },
             )
             .with_signer(signer_seeds),
-            DataV2 {
-                name: name,
-                symbol: symbol,
-                uri: uri,
-                seller_fee_basis_points: 0,
-                creators: None,
-                collection: None,
-                uses: None,
-            },
-            true, // is_mutable
-            true, // update_authority_is_signer
-            None, // collection_details
+            name,
+            symbol,
+            uri,
         )?;
+
         Ok(())
     }
 
@@ -105,18 +122,12 @@ pub struct Initialize<'info> {
         payer = user,
         mint::decimals = 9,
         mint::authority = mint,
+        extensions::metadata_pointer::authority = user,
+        extensions::metadata_pointer::metadata_address = mint,
     )]
-    pub mint: Account<'info, Mint>,
-    ///CHECK: Validate with constraint, also checked by metadata program
-    #[account(
-        mut,
-        address = MetadataAccount::find_pda(&mint.key()).0,
-    )]
-    pub metadata: UncheckedAccount<'info>,
-    pub token_program: Program<'info, Token>,
-    pub token_metadata_program: Program<'info, Metadata>,
+    pub mint: InterfaceAccount<'info, Mint>,
+    pub token_program: Program<'info, Token2022>,
     pub system_program: Program<'info, System>,
-    pub rent: Sysvar<'info, Rent>,
 }
 
 #[derive(Accounts)]
@@ -134,15 +145,16 @@ pub struct Increment<'info> {
         seeds = [b"mint"],
         bump = counter.mint_bump,
     )]
-    pub mint: Account<'info, Mint>,
+    pub mint: InterfaceAccount<'info, Mint>,
     #[account(
         init_if_needed,
         payer = user,
         associated_token::mint = mint,
-        associated_token::authority = user
+        associated_token::authority = user,
+        associated_token::token_program = token_program
     )]
-    pub token_account: Account<'info, TokenAccount>,
-    pub token_program: Program<'info, Token>,
+    pub token_account: InterfaceAccount<'info, TokenAccount>,
+    pub token_program: Program<'info, Token2022>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
 }
@@ -153,4 +165,11 @@ pub struct Counter {
     pub count: u64,       // 8 bytes
     pub counter_bump: u8, // 1 byte
     pub mint_bump: u8,    // 1 byte
+}
+
+#[derive(AnchorDeserialize, AnchorSerialize)]
+pub struct TokenMetadataArgs {
+    pub name: String,
+    pub symbol: String,
+    pub uri: String,
 }
