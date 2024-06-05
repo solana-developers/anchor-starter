@@ -5,6 +5,8 @@ This repo is intended to provide an example of:
 - How to use Program Derived Addresses (PDA) and Cross Program Invocations(CPIs) in an Anchor program
 - How to set up a frontend with the program's IDL to invoke instructions on the program.
 
+The examples are built using Anchor version 0.30.0.
+
 ## Anchor Program
 
 Included are 3 versions of a Counter program, each building on the last. The Counter program will only include two instructions:
